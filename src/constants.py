@@ -1,0 +1,22 @@
+
+PH_LIMITS = (6.8, 7.2)
+TEMPERATURE_LIMITS = (35.0, 37.0)
+
+DATA_DIR = "datasets"
+
+N_SIMULATIONS = 1000
+P_MAX = 5
+CV_SPLITS = 3
+POLY_DEGREE_MAX = 3
+KNN_K_MAX = 5
+
+PREDICTION_INTERVAL = 0.95
+ALPHA = 1 - PREDICTION_INTERVAL
+
+## Economics ##
+COST_GLUCOSE = 10 # $/mM
+COST_GLUTAMINE = 20 # $/mM
+COST_VCD = 0.0005 # $/cell/mL
+
+CULTURE_VALUE = 1000 # $/L per mg/L
+DOWNTIME_DAYS = 1 # 1 day of downtime for the bioreactor
