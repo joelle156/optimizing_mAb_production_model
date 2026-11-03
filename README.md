@@ -94,7 +94,7 @@ The hyperparameter tuning identified the **Polynomial NVAR model** with lag orde
 Later lag orders, past *p*=2 resulted in much higher RMSE. This is due to the fact that as lag order increases, more past values (lagged values) are required, increasing error and the risk of overfitting.
 A lag order of *p*=2 uses immediate history (*t*-1 and *t*-2).
 Similarly, a polynomial degree of two is well suited for the model as higher polynomial degrees introduce overfitting. 
-In fact, only a degree of 2 and 3 were tested. A degree of 1 produces a linear model which is certain to have not fitted the model and thus it was not tested
+In fact, only a degree of 2 and 3 were tested. A degree of 1 produces a linear model which is certain to have not fitted the model and thus it was not tested.
 
 ![Polynomial NVAR Curve](figures/residuals_poly_p02.png)
 
