@@ -82,12 +82,6 @@ The model was evaluated across 5 lag orders (*p* = 1,2,3,4,5) and 2 regression a
 Based on the requirements of this model, an NVAR model was most suitable. The model was required to be able to model different feature time series' simultaneously, something possible through Vector Autoregression.
 A NVAR model rather than a VAR model was deemed appropriate due to its superior forecast flexibility, better suited for complex biological processes such as this one.
 
-The hyperparameter tuning identified the **Polynomial NVAR model** with lag order ***p*=2** and a **polynomial degree of 2** as the wining model as it achieved the lowest Root Mean Squared Error (**RMSE = 29267.4951**).
-Later lag orders, past *p*=2 resulted in much higher RMSE. This is due to the fact that as lag order increases, more past values (lagged values) are required, increasing error and the risk of overfitting.
-A lag order of *p*=2 uses immediate history (*t*-1 and *t*-2).
-Similarly, a polynomial degree of two is well suited for the model as higher polynomial degrees introduce overfitting. 
-In fact, only a degree of 2 and 3 were tested. A degree of 1 produces a linear model which is certain to have not fitted the model and thus it was not tested
-
 | p | Poly RMSE            | Poly Degree | kNN RMSE           | kNN Weights   |
 |---|----------------------|-------------|--------------------|---------------|
 | 1 | 31960.503822671468   | 2           | 96191.25104513696  | k=5, uniform  |
@@ -95,6 +89,14 @@ In fact, only a degree of 2 and 3 were tested. A degree of 1 produces a linear m
 | 3 | 30857.823375579082   | 2           | 98453.64096465334  | k=5, uniform  |
 | 4 | 33940.49619658256    | 2           | 99296.57778932787  | k=5, uniform  |
 | 5 | 39784.65405289209    | 2           | 99530.91762498864  |  k=5, uniform |
+
+The hyperparameter tuning identified the **Polynomial NVAR model** with lag order ***p*=2** and a **polynomial degree of 2** as the wining model as it achieved the lowest Root Mean Squared Error (**RMSE = 29267.4951**).
+Later lag orders, past *p*=2 resulted in much higher RMSE. This is due to the fact that as lag order increases, more past values (lagged values) are required, increasing error and the risk of overfitting.
+A lag order of *p*=2 uses immediate history (*t*-1 and *t*-2).
+Similarly, a polynomial degree of two is well suited for the model as higher polynomial degrees introduce overfitting. 
+In fact, only a degree of 2 and 3 were tested. A degree of 1 produces a linear model which is certain to have not fitted the model and thus it was not tested
+
+![Polynomial NVAR Curve](figures/residuals_poly_p02.png)
 
 ### Model Comparison
 Two model architectures were compared in the development of this model: a Polynomial-NVAR model and a k-NN NVAR model(*k*=1,2,3,4,5 with uniform weights).
@@ -124,7 +126,7 @@ VCD values are around 10<sup>6</sup> or 10<sup>6</sup> whereas glucose concentra
 - **Harvest Time**: The harvest time both directly and indirectly impacts the space-time profit and yield. The harvest time influences the mAb production and is directly involved in the calculations for space-time profit (Profit [$/L]) / ((Harvest time [d]) + (Downtime [d])) and space-time yield (mAb [mg/L]) / ((Harvest time [d]) + (Downtime [d])). If harvesting occurs too early, some mAb is left unproduced. But if harvesting occurs too late, time has been unnecessarily wasted, decreasing both the space-time profit and yield.
 
 ### Optimal Initial Conditions and Economic Summary
-Through the optimization of the Monoclonal Antibodies Production Process, the initial conditions of **Batch 319** were identified as the optimal operating conditions.
+Through the optimization of the Monoclonal Antibodies Production Process, the initial conditions of **batch 319** were identified as the optimal operating conditions.
 
 To maximize the space-time profit, the production process should be executed using the following recommended and estimated parameters:
 
@@ -134,7 +136,13 @@ To maximize the space-time profit, the production process should be executed usi
 - **Harvest Time**: 104.0 hours (4.33 days)
 - **Cell culture cost**: $390.0/L
 - **Cell culture value at harvest**: \$852.41/L ($95\%$ PI: $[690.88, 1005.55]$)
-- **Space-time Profit**: $\$86.70 / (\text{L} \cdot \text{d})$ ($95\%$ PI: $[\$56.42, \$115.42])
+- **Space-time Profit**: $86.70 \text{ dollars} / (\text{L} \cdot \text{d})$ ($95\%$ PI: [\$56.42, \$115.42])
 - **Space-time Yield**: $0.160\text{ mg} / (\text{L} \cdot \text{d})$ ($95\%$ PI: $[0.130, 0.189]$)
 
-![Polynomial NVAR Curve](figures/residuals_poly_p02.png)
+By looking at how the initial conditions were expected to influence the space-time profit and yield, we can confirm whether results are within expectations.
+- The initial glucose and glutamine concentrations were required to be abundant enough that the cells grow and do not starve but not so abundant as to bring up the cell culture cost.
+One can see that the recommended concentration falls near the middle of the range of initial glucose and glutamine concentrations of the batches.
+- As for the harvest time, mAb concentration increases quite rapidly with these initial nutrient concentrations. Then, in most batches, the growth plateaus around the 170 hour. In fact at lower nutrient concentrations, this occurs much sooner.
+Therefore, the most efficient process should stop production before this plateau point, as proven by the recommended Harvest time.
+- Finally, the viable cell density (VCD). The VCD ranged from 200,000 to 1.4 million cells/mL. As discussed, higher VCD increases the cell culture costs which in turn decreases the space-time profit and yield.
+Therefore, the model recommended an initial VCD of 400,000 cells/mL.
