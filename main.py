@@ -6,7 +6,6 @@ import src.functions as sf  # This allows you to access functions from functions
 from src.constants import *  # This imports all constants from constants.py
 
 
-
 def main():
     df_combined, df_ic_all, df_ic_train = sf.data_loading(DATA_DIR)
 

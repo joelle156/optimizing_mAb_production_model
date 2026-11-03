@@ -126,7 +126,6 @@ def nvar_models(x_lag, x_cur, b_cur, p):
 def calculate_and_plot_residuals(
         grid_model, x_lag, x_cur, features, feature_plot, t_cur, df, model_name, p
 ):
-
     ## Max and Min of the x-axis
     x_left = np.min(df.loc[:, "Time [h]"]) - 1
     x_right = np.max(df.loc[:, "Time [h]"]) + 1
