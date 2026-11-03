@@ -85,9 +85,16 @@ A NVAR model rather than a VAR model was deemed appropriate due to its superior 
 The hyperparameter tuning identified the **Polynomial NVAR model** with lag order ***p*=2** and a **polynomial degree of 2** as the wining model as it achieved the lowest Root Mean Squared Error (**RMSE = 29267.4951**).
 Later lag orders, past *p*=2 resulted in much higher RMSE. This is due to the fact that as lag order increases, more past values (lagged values) are required, increasing error and the risk of overfitting.
 A lag order of *p*=2 uses immediate history (*t*-1 and *t*-2).
-Similarly, a polynomial degree of two is well suited for the model as higher polynomial degrees introduce overfitting.
+Similarly, a polynomial degree of two is well suited for the model as higher polynomial degrees introduce overfitting. 
+In fact, only a degree of 2 and 3 were tested. A degree of 1 produces a linear model which is certain to have not fitted the model and thus it was not tested
 
-TABLE
+| p | Poly RMSE            | Poly Degree | kNN RMSE           | kNN Weights   |
+|---|----------------------|-------------|--------------------|---------------|
+| 1 | 31960.503822671468   | 2           | 96191.25104513696  | k=5, uniform  |
+| 2 | 29267.495094058104   | 2           | 97388.79719590838  | k=5, uniform  |
+| 3 | 30857.823375579082   | 2           | 98453.64096465334  | k=5, uniform  |
+| 4 | 33940.49619658256    | 2           | 99296.57778932787  | k=5, uniform  |
+| 5 | 39784.65405289209    | 2           | 99530.91762498864  |  k=5, uniform |
 
 ### Model Comparison
 Two model architectures were compared in the development of this model: a Polynomial-NVAR model and a k-NN NVAR model(*k*=1,2,3,4,5 with uniform weights).
@@ -95,6 +102,9 @@ The k-NN NVAR model yielded RMSE values ranging between 96,191 and 99,530, rough
 
 The polynomial-NVAR model significantly outperformed the k-NN model. The k-NN model relies on the finding the most similar data point to predict the next value.
 In biological processes such as mAb production, the variables such as glucose concentration follow a more continuous curve. Smooth growth curves are better demonstrated by polynomial functions, as showcased by the difference of error between the two models.
+
+Both models do yield relatively high RMSE, especially the kNN model. This is due to the difference in scales of the different features. 
+VCD values are around 10<sup>6</sup> or 10<sup>6</sup> whereas glucose concentration values float around 10<sup>1</sup>. 
 
 ### Advantages and Limitations
 **Advantages**
@@ -121,11 +131,10 @@ To maximize the space-time profit, the production process should be executed usi
 - **Initial Glucose Concentration**: 15.0 mM
 - **Initial Glutamine Concentration**: 2.0 mM
 - **Initial Viable Cell Density**: 400,000 cells/mL
-- **Harvest Time**: $104.0\text{ hours} \ ($4.33\text{ days}$)$
-- **Cell culture cost**: $\$390.0/\text{L}$
-- **Cell culture value at harvest**: $\$852.41/\text{L}$ ($95\%$ PI: $[\$690.88, \$1005.55]$)
-- **Space-time Profit**: $\$86.70 / (\text{L} \cdot \text{d})$ ($95\%$ PI: $[\$56.42, \$115.42]$)
+- **Harvest Time**: 104.0 hours (4.33 days)
+- **Cell culture cost**: $390.0/L
+- **Cell culture value at harvest**: \$852.41/L ($95\%$ PI: $[690.88, 1005.55]$)
+- **Space-time Profit**: $\$86.70 / (\text{L} \cdot \text{d})$ ($95\%$ PI: $[\$56.42, \$115.42])
 - **Space-time Yield**: $0.160\text{ mg} / (\text{L} \cdot \text{d})$ ($95\%$ PI: $[0.130, 0.189]$)
 
-TABLE
-FIGURE
+![Polynomial NVAR Curve](figures/residuals_poly_p02.png)

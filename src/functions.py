@@ -269,7 +269,6 @@ def space_time_profit(best_model, df_ic_all, features, p, res_residuals):
         ## Tiles the vector
         x_lag_current = np.tile(x_init, p).reshape(1, -1)
 
-        # 30x8 = 240
         t_max_steps = 30
         time_hours = 0.0
 
