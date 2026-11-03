@@ -65,7 +65,7 @@ By confirming that error distributions remain centered around zero and bound by 
 The final stage of the process involves simultaneous forecasting and the optimization of the space-time profit using the `space_time_profit` function.
 
 This stage is necessary because future values cannot be predicted with absolute certainty. By performing repeated simulations (1000), a more likely range of values can be determined through estimating prediction intervals.
-By running predictions across all candidate initial condition batches, the optimization algorithm determines the precise initial conditions and harvest time that maximize Space-Time Profit ($\$ / (\text{L} \cdot \text{d})$).
+By running predictions across all candidate initial condition batches, the optimization algorithm determines the precise initial conditions and harvest time that maximize Space-Time Profit ($/L·d).
 
 By evaluating candidate initial condition combinations and quantifying forecast uncertainty, this stage identifies the winning production parameters and exports the final optimal metrics (`optimal_mAb_production_parameters.csv`) alongside supporting evidence.
 
