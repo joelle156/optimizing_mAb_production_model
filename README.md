@@ -121,8 +121,8 @@ VCD values are around 10<sup>6</sup> or 10<sup>6</sup> whereas glucose concentra
 - Polynomial models are sensitive to outlier data. If the conditions fall outside the training data, there may be some instability with some of the polynomial terms.
 
 ### Initial Conditions and Space-Time Profit and Yield
-- **Initial Viable Cell Density**: The initial viable cell density (VCD) is a property involved in the calculation of the cell culture cost. VCD refers to the number of cells per unit volume in a culture. Higher VCD means more cells, meaning an accelerated consumption of glucose and glutamine. This increases the number of cells, increasing VCD of the culture. A high VCD increases the cell culture costs linearly ($\$0.0005 \text{ per cell/mL}$), which can negatively impact the space-time profit and yield.
-- **Initial Glucose and Glutamine Concentration**: Glucose and glutamine concentrations must be adequately high to prevent nutrient starvation of the cells and to stimulate growth. However, initial glucose and glutamine concentrations do increase the cell culture costs significantly($\$10/\text{mM}$ for glucose, $\$20/\text{mM}$ for glutamine) and thus the concentrations must be balanced appropriately.
+- **Initial Viable Cell Density**: The initial viable cell density (VCD) is a property involved in the calculation of the cell culture cost. VCD refers to the number of cells per unit volume in a culture. Higher VCD means more cells, meaning an accelerated consumption of glucose and glutamine. This increases the number of cells, increasing VCD of the culture. A high VCD increases the cell culture costs linearly ($\text{\$0.0005 per cell/mL}$), which can negatively impact the space-time profit and yield.
+- **Initial Glucose and Glutamine Concentration**: Glucose and glutamine concentrations must be adequately high to prevent nutrient starvation of the cells and to stimulate growth. However, initial glucose and glutamine concentrations do increase the cell culture costs significantly($\text{\$10/mM}$ for glucose, $\text{\$20/mM}$ for glutamine) and thus the concentrations must be balanced appropriately.
 - **Harvest Time**: The harvest time both directly and indirectly impacts the space-time profit and yield. The harvest time influences the mAb production and is directly involved in the calculations for space-time profit (Profit [$/L]) / ((Harvest time [d]) + (Downtime [d])) and space-time yield (mAb [mg/L]) / ((Harvest time [d]) + (Downtime [d])). If harvesting occurs too early, some mAb is left unproduced. But if harvesting occurs too late, time has been unnecessarily wasted, decreasing both the space-time profit and yield.
 
 ### Optimal Initial Conditions and Economic Summary
@@ -136,7 +136,7 @@ To maximize the space-time profit, the production process should be executed usi
 - **Harvest Time**: 104.0 hours (4.33 days)
 - **Cell culture cost**: $390.0/L
 - **Cell culture value at harvest**: \$852.41/L ($95\%$ PI: $[690.88, 1005.55]$)
-- **Space-time Profit**: $86.70 \text{ dollars} / (\text{L} \cdot \text{d})$ ($95\%$ PI: [\$56.42, \$115.42])
+- **Space-time Profit**: \$86.70/(L·d) ($95\%$ PI: [\$56.42, \$115.42])
 - **Space-time Yield**: $0.160\text{ mg} / (\text{L} \cdot \text{d})$ ($95\%$ PI: $[0.130, 0.189]$)
 
 By looking at how the initial conditions were expected to influence the space-time profit and yield, we can confirm whether results are within expectations.
