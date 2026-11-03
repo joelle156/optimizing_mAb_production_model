@@ -1,7 +1,4 @@
 
-PH_LIMITS = (6.8, 7.2)
-TEMPERATURE_LIMITS = (35.0, 37.0)
-
 DATA_DIR = "datasets"
 
 N_SIMULATIONS = 1000

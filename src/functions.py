@@ -17,9 +17,11 @@ from constants import CV_SPLITS, POLY_DEGREE_MAX, KNN_K_MAX, P_MAX, ALPHA, PREDI
 
 
 def data_loading(data_dir):
+    ## Loads initial conditions data and batch data
     ic_path = os.path.join(data_dir, "initial_conditions.csv")
     df_ic_all = pd.read_csv(ic_path)
 
+    ## Combines batch data into one DataFrame
     file_pattern = os.path.join(data_dir, "batch_*.csv")
     file_list = sorted(glob.glob(file_pattern))
 
@@ -38,6 +40,7 @@ def data_loading(data_dir):
 
     df_combined = pd.concat(df_list, ignore_index=True)
 
+    ## Produces dataFrame with initial conditions related to the batches only, rom the initial condition DataFrame
     df_ic_train = df_ic_all[df_ic_all["Batch ID"].isin(loaded_batch_names)].reset_index(drop=True)
 
     return df_combined, df_ic_all, df_ic_train
@@ -49,6 +52,7 @@ def generate_x_lag_cur_var(p, batch_ids, df, features, col_batch="Batch ID", col
     t_cur = []
     b_cur = []
 
+    ## Sets up lagged values
     for batch_id in batch_ids:
         mask = df.loc[:, col_batch] == batch_id
         x_batch = df.loc[mask, features].to_numpy()
@@ -79,8 +83,10 @@ def generate_x_lag_cur_var(p, batch_ids, df, features, col_batch="Batch ID", col
 
 
 def nvar_models(x_lag, x_cur, b_cur, p):
+    ## Ensures samples from the same group are not split
     gkf = GroupKFold(n_splits=CV_SPLITS)
 
+    ## Polynomial Model Pipeline
     poly_pipeline = make_pipeline(
         StandardScalerVAR(p=p),
         PolynomialFeatures(include_bias=False),
@@ -89,12 +95,15 @@ def nvar_models(x_lag, x_cur, b_cur, p):
 
     param_grid_poly = dict(polynomialfeatures__degree=[i for i in range(2, POLY_DEGREE_MAX + 1)])
 
+    ## Hyperparameter (degree) tuning, scored using RMSE
     grid_poly = GridSearchCV(
         estimator=poly_pipeline, param_grid=param_grid_poly, cv=gkf, scoring="neg_root_mean_squared_error",
         return_train_score=True
     )
+    ## Fit the model
     grid_poly.fit(x_lag, x_cur, groups=b_cur)
 
+    ## kNN model pipeline
     knn_pipeline = make_pipeline(
         StandardScalerVAR(p=p),
         KNeighborsRegressor()
@@ -103,10 +112,12 @@ def nvar_models(x_lag, x_cur, b_cur, p):
     param_grid_knn = dict(kneighborsregressor__n_neighbors=[i for i in range(2, KNN_K_MAX + 1)],
                           kneighborsregressor__weights=["uniform", "distance"])
 
+    ## Hyperparameter (k value and weights) tuning, scored using RMSE
     grid_knn = GridSearchCV(
         estimator=knn_pipeline, param_grid=param_grid_knn, cv=gkf, scoring="neg_root_mean_squared_error",
         return_train_score=True
     )
+    ## Fit the model
     grid_knn.fit(x_lag, x_cur, groups=b_cur)
 
     return grid_poly, grid_knn
@@ -116,9 +127,11 @@ def calculate_and_plot_residuals(
         grid_model, x_lag, x_cur, features, feature_plot, t_cur, df, model_name, p
 ):
 
+    ## Max and Min of the x-axis
     x_left = np.min(df.loc[:, "Time [h]"]) - 1
     x_right = np.max(df.loc[:, "Time [h]"]) + 1
 
+    ## Calculate the residual error (white noise)
     x_cur_pred = grid_model.predict(x_lag)
     x_cur_res = x_cur_pred - x_cur
     idx_fp = features.index(feature_plot)
@@ -129,6 +142,7 @@ def calculate_and_plot_residuals(
 
     t_unique = np.unique(t_cur)
 
+    ## The residual error will be analyzed at each unique time point
     for t in t_unique:
         mask = t_cur == t
         x_cur_res_t = x_cur_res[mask, idx_fp]
@@ -136,6 +150,7 @@ def calculate_and_plot_residuals(
         n_mean = np.mean(x_cur_res_t)
         n_sd = np.std(x_cur_res_t)
 
+        ## Calculates the prediction interval (PI) using Student's t distribution
         q = ALPHA / 2
         dof = x_cur_res_t.shape[0] - 1
         pi_sd = stats.t.isf(q=q, df=dof)
@@ -153,6 +168,7 @@ def calculate_and_plot_residuals(
                 np.max(np.abs(res_pi_lower)),
                 np.max(np.abs(x_cur_res[:, idx_fp])))
 
+    ## Plot Generation and Formatting
     fig, ax = plt.subplots(1, 1, figsize=(8, 6), dpi=300, layout="constrained")
 
     ax.scatter(t_cur, x_cur_res[:, idx_fp], label="Noise", color="tab:pink", s=12,
@@ -167,6 +183,7 @@ def calculate_and_plot_residuals(
     ax.set_ylabel(f"{feature_plot} (Residuals)", fontsize=14)
     ax.legend(loc="upper left", fontsize=12)
 
+    ## x-axis ticks set every 24 hours, batches record in 8 hour intervals for 672 hours
     ax.xaxis.set_major_locator(MultipleLocator(24))
     ax.tick_params(axis="y", which="major", labelsize=12)
     ax.tick_params(axis="x", which="major", labelsize=8)
@@ -180,6 +197,7 @@ def calculate_and_plot_residuals(
 
 
 def nvar_hyperparams(df_combined, batch_ids, features):
+    ## For each p in range, knn and polynomial plots are formed and the results are stored
     results = []
 
     for p in range(1, P_MAX + 1):
@@ -216,16 +234,20 @@ def space_time_profit(best_model, df_ic_all, features, p, res_residuals):
     rng = np.random.default_rng(0)
     n_simulations = 1000
 
+    ## An initial placeholder value of negative infinity
     best_space_time_profit = -np.inf
     optimization_results = {}
 
+    ## Returns the position of the first occurrence of the feature, i.e. finds the columns
     idx_g = features.index("Glucose [mM]")
     idx_a = features.index("Glutamine [mM]")
     idx_vcd = features.index("VCD [cells/mL]")
     idx_mab = features.index("mAb [mg/L]")
 
+    ## Creates list of dictionaries each representing a row of the initial condition DataFrame
     candidate_records = df_ic_all.to_dict("records")
 
+    ## For each batch, the ID, glucose concentration, glutamine concentration and VCD is identified
     for row in candidate_records:
         batch_id = row["Batch ID"]
         g0 = float(row["Glucose [mM]"])
@@ -234,15 +256,17 @@ def space_time_profit(best_model, df_ic_all, features, p, res_residuals):
 
         culture_cost = COST_GLUCOSE * g0 + COST_GLUTAMINE * a0 + COST_VCD * v0
 
-        # Initial state vector at t = 0
+        # Creates NumPy array of zeros and then assign specific indices initial values at t=0
         x_init = np.zeros(len(features))
         x_init[idx_g] = g0
         x_init[idx_a] = a0
         x_init[idx_vcd] = v0
 
+        ## Sets TCD equal to VCD
         if "TCD [cells/mL]" in features:
             x_init[features.index("TCD [cells/mL]")] = v0
 
+        ## Tiles the vector
         x_lag_current = np.tile(x_init, p).reshape(1, -1)
 
         # 30x8 = 240
@@ -256,10 +280,12 @@ def space_time_profit(best_model, df_ic_all, features, p, res_residuals):
             x_pred = best_model.predict(x_lag_current)[0]
             mab_t = max(0.0, float(x_pred[idx_mab]))
 
+            ## Calculates Economic values
             val_t = CULTURE_VALUE * mab_t
             profit_t = val_t - culture_cost
             stp_t = profit_t / (time_days + DOWNTIME_DAYS)
 
+            ## If the calculated space time profit is less than the previous best space time profit replace the results
             if stp_t > best_space_time_profit:
                 best_space_time_profit = stp_t
                 optimization_results = {
